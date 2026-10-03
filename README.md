@@ -6,7 +6,7 @@ TWYLT is a small, language-independent protocol for turning ordinary executables
 
 A TWYLT tool can publish its identity, requirements, input/output JSON Schemas and examples, then accept validated JSON input and return validated JSON output. The protocol does not depend on ToolHub, MCP, an LLM, or any particular agent framework.
 
-**Python package:** `twylt` 1.0.0  
+**Python package:** `twylt` 1.0.0
 **TWYLT protocol:** 1.8
 
 ## Quick start
@@ -218,6 +218,10 @@ Before a release, both the source tree and the final packaged artifact must pass
 - [`examples/list_directory`](examples/list_directory) — complete example tool.
 
 TWYLT 1.0.0 succeeds ToolSpec 1.6.2. The first protocol version under the TWYLT name is 1.8; historical names remain in the changelog and ADRs intentionally.
+
+## Moar TWYLT related resources
+
+Check [`RESOURCES.md`](RESOURCES.md) for other than Python TWYLT implementations, ready made toolpacks with TWYLT under the hood and other related sources
 
 ## License
 
