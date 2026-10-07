@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import importlib.util
 import json
+import io
 import os
 import runpy
 import sys
@@ -89,12 +90,26 @@ def _print(value: Any) -> None:
         print(json.dumps(value, ensure_ascii=False, indent=2))
 
 
-def run_tool_file(path: str | Path) -> None:
+def _run_tool_file(path: str | Path) -> None:
     """Entry point used by a tiny launcher placed before optional imports."""
     path = Path(path)
     mode = os.environ.get("INPUT_DESCRIBE", "")
+    # Inspect describe without importing optional business dependencies.
+    # Replay stdin so normal Tool.run() retains its transport semantics.
+    payload = None
+    if len(sys.argv) > 1 and sys.argv[1].lstrip().startswith('{'):
+        try: payload = json.loads(sys.argv[1])
+        except ValueError: pass
+    elif not mode and not sys.stdin.isatty():
+        try: raw = sys.stdin.read()
+        except (OSError, io.UnsupportedOperation): raw = ''
+        sys.stdin = io.StringIO(raw)
+        try: payload = json.loads(raw)
+        except ValueError: pass
+    if isinstance(payload, dict) and payload.get('describe') not in (None, ''):
+        mode = payload['describe']
 
-    if mode in {"requirements", "json_spec"}:
+    if isinstance(mode,str) and mode in {"requirements", "json_spec"}:
         static = extract_static_metadata(path)
 
         if mode == "requirements":
@@ -124,3 +139,12 @@ def run_tool_file(path: str | Path) -> None:
 
     # All other modes preserve normal Python import/error semantics.
     namespace = runpy.run_path(str(path), run_name="__main__")
+
+
+def run_tool_file(path: str | Path) -> None:
+    """Run a tool and restore the caller's stdin after transport inspection."""
+    original_stdin = sys.stdin
+    try:
+        _run_tool_file(path)
+    finally:
+        sys.stdin = original_stdin

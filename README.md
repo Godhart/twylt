@@ -1,4 +1,4 @@
-# TWYLT 1.0.0
+# TWYLT 1.1.0
 
 **TWYLT — TWYLT Wraps Your Local Tool.**
 
@@ -6,7 +6,7 @@ TWYLT is a small, language-independent protocol for turning ordinary executables
 
 A TWYLT tool can publish its identity, requirements, input/output JSON Schemas and examples, then accept validated JSON input and return validated JSON output. The protocol does not depend on ToolHub, MCP, an LLM, or any particular agent framework.
 
-**Python package:** `twylt` 1.0.0
+**Python package:** `twylt` 1.1.0  
 **TWYLT protocol:** 1.8
 
 ## Quick start
@@ -37,7 +37,7 @@ class Echo(Tool[Input, Output]):
     output_model = Output
 
     name = "echo"
-    version = "1.0.0"
+    version = "1.1.0"
     description = "Return the supplied text."
 
     def biz(self, data: Input) -> Output:
@@ -124,9 +124,9 @@ Input and output contracts may be versioned independently from both the tool and
 ```python
 class MyTool(Tool[Input, Output]):
     input_schema_name = "MyToolInput"
-    input_schema_version = "1.0.0"
+    input_schema_version = "1.1.0"
     output_schema_name = "MyToolOutput"
-    output_schema_version = "1.0.0"
+    output_schema_version = "1.1.0"
 ```
 
 These become JSON Schema `$id` and `x-schema-version`. Pydantic field metadata such as descriptions, aliases, constraints, defaults and JSON Schema extras is preserved in the published schemas.
@@ -226,3 +226,10 @@ Check [`RESOURCES.md`](RESOURCES.md) for other than Python TWYLT implementations
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
+
+## Guardrails in 1.1.0
+
+Optional cooperative filesystem/transport/network checks are provided by
+`twylt.guardrails`. Disabled by default, enabled in toolhub-images 0.3.0.
+`TWYLT_ALLOWED_CWD` includes subdirectories without extending the business workspace.
+See [configuration and API](docs/GUARDRAILS.md) and [migration](MIGRATION.md).

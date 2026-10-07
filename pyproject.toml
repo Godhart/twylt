@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "twylt"
-version = "1.0.0"
+version = "1.1.0"
 description = "Python reference implementation of TWYLT, a contract for self-describing executable tools."
 readme = "README.md"
 license = {file = "LICENSE"}

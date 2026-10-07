@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, ClassVar, Generic, TypeVar, get_args, get_origin, Annotated, Union
 from types import UnionType
 from pydantic import BaseModel, ConfigDict, create_model, ValidationError
+from .guardrails import Policy, WorkspaceDenied, GuardrailsConfigError
 from .metadata import Requirements
 from .protocol import TWYLT_FORMAT_VERSION
 
@@ -271,11 +272,11 @@ Options:
 
     @classmethod
     def _load_file_input(cls):
-        return cls._strict_input_model().model_validate(json.loads(cls.input_path.read_text(encoding="utf-8")))
+        return cls._strict_input_model().model_validate(json.loads(Policy(cls.name).transport_path(cls.input_path).read_text(encoding="utf-8")))
 
     @classmethod
     def _write_output(cls,value):
-        cls.output_path.write_text(json.dumps(value.model_dump(mode="json"),ensure_ascii=False,indent=2),encoding="utf-8")
+        Policy(cls.name).transport_path(cls.output_path).write_text(json.dumps(value.model_dump(mode="json"),ensure_ascii=False,indent=2),encoding="utf-8")
 
     @classmethod
     def _debug_enabled(cls, cli_debug=False):
@@ -328,6 +329,8 @@ Options:
     def _report_exception(cls,exc,error_type,source,stage,message,debug=False,error_format="json"):
         import traceback
         cls.last_error=_normalized_error(error_type,source,stage,message,exception=exc)
+        if isinstance(exc, WorkspaceDenied):
+            cls.last_error['error'].update(code=exc.code, incident_id=exc.incident_id)
         if error_format=="json":
             rendered=json.loads(json.dumps(cls.last_error,ensure_ascii=False))
             if debug:
@@ -363,7 +366,11 @@ Options:
                 try: data=cls._strict_input_model().model_validate(clean)
                 except ValidationError as exc:
                     cls._report_validation(exc,"input",debug,error_format); raise SystemExit(2)
-                try: produced=cls().biz(data)
+                try:
+                    Policy(cls.name)
+                    produced=cls().biz(data)
+                except (WorkspaceDenied, GuardrailsConfigError):
+                    raise
                 except Exception as exc:
                     if error_format=="json":
                         cls._report_exception(exc,"execution_error","tool","biz","Tool execution failed",debug,error_format)
@@ -374,14 +381,26 @@ Options:
                 except ValidationError as exc:
                     cls._report_validation(exc,"output",debug,error_format); raise SystemExit(3)
                 cls._print(result.model_dump(mode="json")); return
-            cls.output_path.unlink(missing_ok=True)
+            try:
+                policy = Policy(cls.name)
+                policy.transport_path(cls.input_path)
+                policy.transport_path(cls.output_path).unlink(missing_ok=True)
+            except (WorkspaceDenied, GuardrailsConfigError) as exc:
+                cls._report_exception(exc,"guardrails_error","twylt","transport","Transport policy denied",debug,error_format)
+                raise SystemExit(6)
             try: data=cls._load_file_input()
             except ValidationError as exc:
                 cls._report_validation(exc,"input",debug,error_format); raise SystemExit(2)
+            except (WorkspaceDenied, GuardrailsConfigError):
+                raise
             except Exception as exc:
                 cls._report_exception(exc,"protocol_error","twylt","transport","Failed to read or parse input",debug,error_format)
                 raise SystemExit(4)
-            try: produced=cls().biz(data)
+            try:
+                Policy(cls.name)
+                produced=cls().biz(data)
+            except (WorkspaceDenied, GuardrailsConfigError):
+                raise
             except Exception as exc:
                 if error_format=="json":
                     cls._report_exception(exc,"execution_error","tool","biz","Tool execution failed",debug,error_format)
@@ -392,5 +411,8 @@ Options:
             except ValidationError as exc:
                 cls._report_validation(exc,"output",debug,error_format); raise SystemExit(3)
             cls._write_output(result)
+        except (WorkspaceDenied, GuardrailsConfigError) as exc:
+            cls._report_exception(exc,"guardrails_error","twylt","guardrails","Policy denied",debug,error_format)
+            raise SystemExit(6)
         finally:
             sys.argv=original_argv

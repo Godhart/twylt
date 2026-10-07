@@ -1,3 +1,11 @@
+# 1.1.0 — 2026-10-07
+
+- Optional centralized cooperative guardrails; nested allowed cwd separated from workspace.
+- Guard transport deletion/read/write without mutating tool class paths.
+- Unified policy errors and incidents; strict ContractModel.
+- Bootstrap describe via CLI/stdin survives missing business imports.
+- Preserve TWYLT protocol 1.8 and previous regressions.
+
 # Changelog
 
 ## 1.0.0 - 2026-09-26
