@@ -16,6 +16,7 @@ TWYLT is inspired by this tools and designed for this tools in first place:
 
 ### General usage
 
+- Toolpak for **essential** things like sleep, echo checking, wget, curl etc. https://github.com/Godhart/twylt-pack-essential
 - Toolpak for general **filesystem** opreations https://github.com/Godhart/twylt-pack-filesystem
 - Toolpak for **git** operaions https://github.com/Godhart/twylt-pack-git
 - Toolpak for **running apps** under docker/podman https://github.com/Godhart/twylt-pack-docker
@@ -33,3 +34,4 @@ TWYLT is inspired by this tools and designed for this tools in first place:
 - Build **toolkit pack** for Toolhub out of bunch TWYLTed tools https://github.com/Godhart/toolpack-builder
 - **MCP** bridge for Toolhub https://github.com/Godhart/toolhub-mcp-bridge
 - **Docker/Podman** images for running tools in controlled environment https://github.com/Godhart/toolhub-images
+- **Gateway** for running on hosting, exposing MCP interface with OAuth https://github.com/Godhart/toolhub-gateway.git
