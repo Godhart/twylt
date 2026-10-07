@@ -16,7 +16,7 @@ TWYLT is inspired by this tools and designed for this tools in first place:
 
 ### General usage
 
-- Toolpak for **essential** things like sleep, echo checking, wget, curl etc. https://github.com/Godhart/twylt-pack-essential
+- Toolpak for **essential** things like sleep, echo checking, ping, wget, curl etc. https://github.com/Godhart/twylt-pack-essential
 - Toolpak for general **filesystem** opreations https://github.com/Godhart/twylt-pack-filesystem
 - Toolpak for **git** operaions https://github.com/Godhart/twylt-pack-git
 - Toolpak for **running apps** under docker/podman https://github.com/Godhart/twylt-pack-docker
