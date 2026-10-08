@@ -2,10 +2,9 @@ from __future__ import annotations
 
 # Deliberately keep metadata declarative: bootstrap.py can read it even if an
 # optional import below is missing.
-from pathlib import Path
-
 from pydantic import BaseModel, Field
 from twylt import Requirements, Tool
+from twylt.guardrails import Workspace
 
 
 class Input(BaseModel):
@@ -26,7 +25,7 @@ class ListDirectory(Tool[Input, Output]):
     output_model = Output
 
     name = "list-directory"
-    version = "1.0.0"
+    version = "1.1.0"
     input_schema_name = "ListDirectoryInput"
     input_schema_version = "1.0.0"
     output_schema_name = "ListDirectoryOutput"
@@ -35,7 +34,7 @@ class ListDirectory(Tool[Input, Output]):
     requirements = Requirements(
         tool="pip",
         format="requirements.txt",
-        content="pydantic>=2.0\n",
+        content="twylt>=1.1.0,<2\npydantic>=2.0\n",
     )
     few_shots = [
         {
@@ -45,13 +44,16 @@ class ListDirectory(Tool[Input, Output]):
     ]
 
     def biz(self, data: Input) -> Output:
-        base = Path(data.path)
-        return Output(
-            entries=[
-                Entry(name=p.name, is_dir=p.is_dir())
-                for p in sorted(base.iterdir(), key=lambda p: p.name)
-            ]
-        )
+        # Policy maps business paths to the workspace and rejects escapes/links
+        # when TWYLT_GUARDRAILS=1. No policy implementation is copied here.
+        with Workspace(self.name) as workspace:
+            base = workspace.resolve(data.path)
+            entries = []
+            for path in sorted(base.iterdir(), key=lambda path: path.name):
+                # Check children before is_dir() can follow a filesystem link.
+                workspace.inspect(path)
+                entries.append(Entry(name=path.name, is_dir=path.is_dir()))
+            return Output(entries=entries)
 
 
 TOOL = ListDirectory

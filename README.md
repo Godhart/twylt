@@ -1,4 +1,4 @@
-# TWYLT 1.1.0
+# TWYLT 1.1.1
 
 **TWYLT — TWYLT Wraps Your Local Tool.**
 
@@ -6,7 +6,8 @@ TWYLT is a small, language-independent protocol for turning ordinary executables
 
 A TWYLT tool can publish its identity, requirements, input/output JSON Schemas and examples, then accept validated JSON input and return validated JSON output. The protocol does not depend on ToolHub, MCP, an LLM, or any particular agent framework.
 
-**Python package:** `twylt` 1.1.0  
+**Python package:** `twylt` 1.1.1
+
 **TWYLT protocol:** 1.8
 
 ## Quick start
@@ -184,7 +185,7 @@ run_tool_file(Path(__file__).with_name("tool.py"))
 
 This allows `requirements` discovery even when optional runtime dependencies of the tool are not installed. If full loading for `json_spec` fails because such a dependency is unavailable, statically discoverable metadata is still returned and unavailable schemas are represented as `{}`.
 
-See [`examples/list_directory`](examples/list_directory) for a complete example.
+See [`examples`](examples/README.md) for runnable filesystem, network and echo examples.
 
 ## Relationship to MCP and ToolHub
 
@@ -215,7 +216,7 @@ Before a release, both the source tree and the final packaged artifact must pass
 - [`TWYLT.md`](TWYLT.md) — language-independent protocol specification.
 - [`CHANGELOG.md`](CHANGELOG.md) — release history, including the former ToolSpec releases.
 - [`docs/adr`](docs/adr) — architecture decision records and rationale.
-- [`examples/list_directory`](examples/list_directory) — complete example tool.
+- [`examples`](examples/README.md) — self-contained tools: directory listing with path checks, ping with network checks, echo without business guardrails.
 
 TWYLT 1.0.0 succeeds ToolSpec 1.6.2. The first protocol version under the TWYLT name is 1.8; historical names remain in the changelog and ADRs intentionally.
 
@@ -233,3 +234,11 @@ Optional cooperative filesystem/transport/network checks are provided by
 `twylt.guardrails`. Disabled by default, enabled in toolhub-images 0.3.0.
 `TWYLT_ALLOWED_CWD` includes subdirectories without extending the business workspace.
 See [configuration and API](docs/GUARDRAILS.md) and [migration](MIGRATION.md).
+
+## Examples in 1.1.1
+
+`list_directory` checks both its requested path and listed children through
+`Workspace`; `ping` calls `check_network` before the system command; `echo`
+returns its input unchanged and has no business guardrails. All examples contain
+their own contracts and logic, with no essential-pack dependency. See
+[examples/README.md](examples/README.md) for environment configuration and commands.

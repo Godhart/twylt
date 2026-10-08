@@ -25,7 +25,7 @@ class RenameTool(Tool[Input, Output]):
 
 
 def test_twylt_identity_and_protocol_version():
-    assert twylt.__version__ == "1.1.0"
+    assert twylt.__version__ == "1.1.1"
     assert TWYLT_FORMAT_VERSION == "1.8"
     assert TOOL_CONTRACT_FORMAT_VERSION == TWYLT_FORMAT_VERSION
 

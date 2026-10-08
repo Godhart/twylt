@@ -1,3 +1,10 @@
+# 1.1.1 — 2026-10-08
+
+- Add Workspace path checks to list_directory, including checks before child is_dir.
+- Add self-contained ping example with check_network and echo without business guardrails.
+- Document enabled/disabled policies, virtual workspace paths and runnable examples.
+- Preserve TWYLT runtime API, protocol 1.8 and existing tests.
+
 # 1.1.0 — 2026-10-07
 
 - Optional centralized cooperative guardrails; nested allowed cwd separated from workspace.
